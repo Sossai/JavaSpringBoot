@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.engine.internal.Cascade;
 import org.springframework.data.annotation.Reference;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,6 +19,7 @@ import java.util.UUID;
 //@EqualsAndHashCode
 //@RequiredArgsConstructor
 //@AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 @ToString(exclude = "autor")
 public class Livro {
     @Id

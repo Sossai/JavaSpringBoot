@@ -3,11 +3,13 @@ package com.example.libraryapi.controller;
 import com.example.libraryapi.controller.dto.AutorDTO;
 import com.example.libraryapi.controller.dto.ErroResposta;
 import com.example.libraryapi.exceptions.ResgistroDuplicadoException;
+import com.example.libraryapi.mappers.AutorMapper;
 import com.example.libraryapi.model.Autor;
 import com.example.libraryapi.repository.AutorRepository;
 import com.example.libraryapi.service.AutorService;
 import jakarta.validation.Valid;
 import jakarta.websocket.server.PathParam;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,20 +25,25 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("autores")
 public class AutorController {
 
     private final AutorService autorService;
-
+    private final AutorMapper autorMapper;
+/*
     public AutorController(AutorService autorService) {
         this.autorService = autorService;
     }
+
+ */
 
     @PostMapping
     public ResponseEntity<Object> salvar(@RequestBody @Valid AutorDTO autorDTO){
 
         try{
-            var autor = autorService.salvar(autorDTO.toAutor());
+            //var autor = autorService.salvar(autorDTO.toAutor());
+            var autor = autorService.salvar(autorMapper.toEntity(autorDTO));
 
             URI location = ServletUriComponentsBuilder
                     .fromCurrentRequest()
@@ -58,20 +65,36 @@ public class AutorController {
 
     @GetMapping("{id}")
     public ResponseEntity<AutorDTO> recuperarAutor(@PathVariable("id") String id){
+        /*
         Optional<Autor> autorOptional = autorService.recuperar(UUID.fromString(id));
-
         if(autorOptional.isPresent()){
             Autor autor = autorOptional.get();
+
             AutorDTO autorDTO = new AutorDTO(
                     autor.getId(),
                     autor.getNome(),
                     autor.getDataNascimento(),
                     autor.getNacionalidade()
             );
+
+            //AutorDTO autorDTO = autorMapper.toDTO(autor);
             return ResponseEntity.ok(autorDTO);
         }
 
         return ResponseEntity.notFound().build();
+
+        */
+        // .map aplica se tem valor no optional
+
+        return autorService
+                .recuperar(UUID.fromString(id))
+                .map(autor -> {
+                    AutorDTO dto = autorMapper.toDTO(autor);
+                    return ResponseEntity.ok(dto);
+                }).orElseGet(()-> ResponseEntity.notFound().build());
+
+
+
     }
 
     @DeleteMapping("{id}")
