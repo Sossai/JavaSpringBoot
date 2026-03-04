@@ -133,7 +133,7 @@ public class AutorController {
         }
 
  */
-
+        /*
         List<AutorDTO> autorDTOList = autores
                 .stream()
                 .map(
@@ -142,6 +142,13 @@ public class AutorController {
                     autor.getNome(),
                     autor.getDataNascimento(),
                     autor.getNacionalidade())
+                ).collect(Collectors.toList());
+
+         */
+        List<AutorDTO> autorDTOList = autores
+                .stream()
+                .map(
+                        autorMapper::toDTO
                 ).collect(Collectors.toList());
 
 
