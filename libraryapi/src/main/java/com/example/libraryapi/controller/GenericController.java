@@ -1,6 +1,5 @@
-package com.example.libraryapi;
+package com.example.libraryapi.controller;
 
-import org.apache.tomcat.util.buf.UriUtil;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
