@@ -10,6 +10,10 @@ import org.mapstruct.Mapping;
 public interface AutorMapper {
 
     //@Mapping(source = "nome", target = "nomeAutor") // se campos diferentes
+    @Mapping(target = "livros", ignore = true)
+    @Mapping(target = "dataCadastro", ignore = true)
+    @Mapping(target = "dataAtualizacao", ignore = true)
+    @Mapping(target = "idUsuario", ignore = true)
     Autor toEntity(AutorDTO dto);
     AutorDTO toDTO(Autor autor);
 }
