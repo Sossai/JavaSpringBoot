@@ -8,6 +8,7 @@ import com.example.libraryapi.exceptions.ResgistroDuplicadoException;
 import com.example.libraryapi.mappers.AutorMapper;
 import com.example.libraryapi.mappers.LivroMapper;
 import com.example.libraryapi.model.Autor;
+import com.example.libraryapi.model.GeneroLivro;
 import com.example.libraryapi.model.Livro;
 import com.example.libraryapi.service.LivroService;
 import jakarta.validation.Valid;
@@ -15,7 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -61,6 +64,43 @@ public class LivroController implements GenericController{
 
     }
 
+    @DeleteMapping("{id}")
+    public ResponseEntity<Object> deletar(@PathVariable("id") String id){
+        return livroService
+                .obterPorId(UUID.fromString(id))
+                .map(livro -> {
+                    livroService.deletar(livro);
+                    return ResponseEntity.noContent().build();
+                }).orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
+    @GetMapping
+    public ResponseEntity<List<ResultadoLivroDTO>> pesquisa(
+            @RequestParam(value = "isbn", required = false)
+            String isbn,
+            @RequestParam(value = "titulo", required = false)
+            String titulo,
+            @RequestParam(value = "nome-autor", required = false)
+            String nomeAutor,
+            @RequestParam(value = "genero", required = false)
+            GeneroLivro generoLivro,
+            @RequestParam(value = "ano-publicacao", required = false)
+            Integer anoPublicacao
+    ){
+
+        var resultado = livroService.buscarPorFiltros(
+                isbn,
+                titulo,
+                nomeAutor,
+                generoLivro,
+                anoPublicacao);
+
+        var lista = resultado
+                .stream()
+                .map(livroMapper::toResultado)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(lista);
+    }
 
 }
