@@ -4,6 +4,7 @@ import com.example.libraryapi.model.GeneroLivro;
 import com.example.libraryapi.model.Livro;
 import com.example.libraryapi.repository.LivroRepository;
 import com.example.libraryapi.repository.specs.LivroSpecs;
+import com.example.libraryapi.validator.LivroValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -19,8 +20,12 @@ import static com.example.libraryapi.repository.specs.LivroSpecs.*;
 public class LivroService {
 
     private final LivroRepository livroRepository;
+    private final LivroValidator livroValidator;
 
     public Livro salvar(Livro livro ){
+
+        livroValidator.validar(livro);
+
         return livroRepository.save(livro);
     }
 

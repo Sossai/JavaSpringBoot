@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface LivroRepository extends JpaRepository<Livro, UUID>, JpaSpecificationExecutor<Livro> {
@@ -21,6 +22,8 @@ public interface LivroRepository extends JpaRepository<Livro, UUID>, JpaSpecific
     List<Livro> findByAutor(Autor autor);
 
     List<Livro> findByTituloAndPreco(String titulo, BigDecimal preco);
+
+    Optional<Livro> findByIsbn(String isbn);
 
     // JPQL
     // select l.* from livro as l order by l.titulo
