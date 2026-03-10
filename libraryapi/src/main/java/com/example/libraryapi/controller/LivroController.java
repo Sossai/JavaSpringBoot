@@ -13,6 +13,7 @@ import com.example.libraryapi.model.Livro;
 import com.example.libraryapi.service.LivroService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -75,7 +76,7 @@ public class LivroController implements GenericController{
     }
 
     @GetMapping
-    public ResponseEntity<List<ResultadoLivroDTO>> pesquisa(
+    public ResponseEntity<Page<ResultadoLivroDTO>> pesquisa(
             @RequestParam(value = "isbn", required = false)
             String isbn,
             @RequestParam(value = "titulo", required = false)
@@ -85,22 +86,30 @@ public class LivroController implements GenericController{
             @RequestParam(value = "genero", required = false)
             GeneroLivro generoLivro,
             @RequestParam(value = "ano-publicacao", required = false)
-            Integer anoPublicacao
+            Integer anoPublicacao,
+
+            @RequestParam(value = "pagina", defaultValue = "0")
+            Integer pagina,
+            @RequestParam(value = "tamanho-pagina", defaultValue = "10")
+            Integer tamanhoPagina
     ){
 
-        var resultado = livroService.buscarPorFiltros(
-                isbn,
-                titulo,
-                nomeAutor,
-                generoLivro,
-                anoPublicacao);
+        Page<Livro> paginaResultado = livroService.buscarPorFiltros(
+                isbn, titulo, nomeAutor, generoLivro, anoPublicacao, pagina,tamanhoPagina);
 
+        Page<ResultadoLivroDTO> resultado = paginaResultado.map(livroMapper::toResultado);
+
+        // usado quado retornar a lista e não p page
+        /*
         var lista = resultado
                 .stream()
                 .map(livroMapper::toResultado)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(lista);
+         */
+        //return ResponseEntity.ok(lista);
+
+        return ResponseEntity.ok(resultado);
     }
 
 }

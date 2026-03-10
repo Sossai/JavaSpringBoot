@@ -3,6 +3,8 @@ package com.example.libraryapi.repository;
 import com.example.libraryapi.model.Autor;
 import com.example.libraryapi.model.GeneroLivro;
 import com.example.libraryapi.model.Livro;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -17,6 +19,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface LivroRepository extends JpaRepository<Livro, UUID>, JpaSpecificationExecutor<Livro> {
+
+    //busca paginada
+    Page<Livro> findByAutor(Autor autr, Pageable pageable);
 
     //query method
     List<Livro> findByAutor(Autor autor);
