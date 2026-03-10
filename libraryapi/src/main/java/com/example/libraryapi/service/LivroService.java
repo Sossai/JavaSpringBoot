@@ -6,6 +6,9 @@ import com.example.libraryapi.repository.LivroRepository;
 import com.example.libraryapi.repository.specs.LivroSpecs;
 import com.example.libraryapi.validator.LivroValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -38,12 +41,15 @@ public class LivroService {
     }
 
     //Specifications
-    public List<Livro> buscarPorFiltros(
+    public Page<Livro> buscarPorFiltros(
             String isbn,
             String titulo,
             String nomeAutor,
             GeneroLivro generoLivro,
-            Integer anoPublicacao
+            Integer anoPublicacao,
+
+            Integer pagina,
+            Integer tamanhoPagina
     ){
         // foi para class de specs
         //Specification<Livro> isbnEqual = (root, query, cb) -> cb.equal(root.get("isbn"), isbn);
@@ -84,7 +90,8 @@ public class LivroService {
             specs = specs.and(nomeAutorLike(nomeAutor));
         }
 
+        Pageable pageRequest = PageRequest.of(pagina, tamanhoPagina);
 
-        return livroRepository.findAll(specs);
+        return livroRepository.findAll(specs,pageRequest);
     }
 }
