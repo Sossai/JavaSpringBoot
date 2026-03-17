@@ -24,7 +24,12 @@ create table livro(
 	constraint chk_genero check(genero in ('FICCAO', 'FANTASIA', 'MISTERIO', 'ROMANCE', 'BIOGRAFIA', 'CIENCIA'))
 );
 
-select * from livro
+create table usuario(
+    id uuid not null primary key,
+    login varchar(20) not null unique,
+    senha varchar(200) not null,
+    roles varchar[]
+)
 
 
 alter table livro
