@@ -1,25 +1,24 @@
 package com.example.libraryapi.controller;
 
-import com.example.libraryapi.controller.dto.AutorDTO;
 import com.example.libraryapi.controller.dto.CadastroLivroDTO;
-import com.example.libraryapi.controller.dto.ErroResposta;
 import com.example.libraryapi.controller.dto.ResultadoLivroDTO;
-import com.example.libraryapi.exceptions.ResgistroDuplicadoException;
 import com.example.libraryapi.mappers.AutorMapper;
 import com.example.libraryapi.mappers.LivroMapper;
-import com.example.libraryapi.model.Autor;
 import com.example.libraryapi.model.GeneroLivro;
 import com.example.libraryapi.model.Livro;
+import com.example.libraryapi.security.SecurityService;
 import com.example.libraryapi.service.LivroService;
+import com.example.libraryapi.service.UsuarioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,14 +28,27 @@ public class LivroController implements GenericController{
     private final LivroService livroService;
     private final LivroMapper livroMapper;
     private final AutorMapper autorMapper;
+    private final UsuarioService usuarioService;
+    private final SecurityService securityService;
 
 
     @PostMapping
-    public ResponseEntity<Void> salvar(@RequestBody @Valid CadastroLivroDTO livroDto){
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")  // ==> semelhante ao config //authorize.requestMatchers("/livros/**").hasAnyRole("ADMIN", "USER");
+    public ResponseEntity<Void> salvar(
+            @RequestBody @Valid CadastroLivroDTO livroDto
+            //,Authentication authentication
+            ){
         // removi os try/catch pq estao sendo tratadas nos handlers
         //try{
 
+        //var usuarioLogado = (UserDetails) authentication.getPrincipal();
+        //var usuario = usuarioService.obterPorLogin(usuarioLogado.getUsername());
+        //ou
+        var usuario = securityService.ObterUsuarioLogado();
+
         Livro livro = livroMapper.toEntity(livroDto);
+        livro.setIdUsuario(usuario.getId());
+
         livroService.salvar(livro);
 
         var location = gerarHeaderLocation(livro.getId());
@@ -50,11 +62,16 @@ public class LivroController implements GenericController{
     }
 
     @GetMapping("{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<ResultadoLivroDTO> buscar(
-            @PathVariable String id
+            @PathVariable String id,
+            Authentication authentication
     ){
         //var livro = livroService.obterPorId(UUID.fromString(id));
         //return ResponseEntity.ok(livroMapper.toResultado(livro));
+
+
+
 
         return livroService
                 .obterPorId(UUID.fromString(id))
@@ -66,6 +83,7 @@ public class LivroController implements GenericController{
     }
 
     @DeleteMapping("{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<Object> deletar(@PathVariable("id") String id){
         return livroService
                 .obterPorId(UUID.fromString(id))
@@ -76,6 +94,7 @@ public class LivroController implements GenericController{
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<Page<ResultadoLivroDTO>> pesquisa(
             @RequestParam(value = "isbn", required = false)
             String isbn,
