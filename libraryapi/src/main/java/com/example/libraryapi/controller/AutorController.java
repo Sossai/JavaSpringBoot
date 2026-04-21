@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -39,6 +40,7 @@ public class AutorController {
  */
 
     @PostMapping
+    @PreAuthorize("haRole('ADMIN')") // ==> //authorize.requestMatchers("/autores/**").hasRole("ADMIN");
     public ResponseEntity<Object> salvar(@RequestBody @Valid AutorDTO autorDTO){
 
         try{
@@ -64,6 +66,7 @@ public class AutorController {
     }
 
     @GetMapping("{id}")
+    @PreAuthorize("haRole('ADMIN')")
     public ResponseEntity<AutorDTO> recuperarAutor(@PathVariable("id") String id){
         /*
         Optional<Autor> autorOptional = autorService.recuperar(UUID.fromString(id));
@@ -98,6 +101,7 @@ public class AutorController {
     }
 
     @DeleteMapping("{id}")
+    @PreAuthorize("haRole('ADMIN')")
     public ResponseEntity<Void> apagar(@PathVariable("id") String id){
 
         var autorId = UUID.fromString(id);
@@ -113,6 +117,7 @@ public class AutorController {
     }
 
     @GetMapping
+    @PreAuthorize("haRole('ADMIN')")
     public ResponseEntity<List<AutorDTO>> buscaAutor(
             @RequestParam(value = "nome" ,required = false) String nome,
             @RequestParam(value = "nacionalidade", required = false) String nacionalidade)
@@ -156,6 +161,7 @@ public class AutorController {
     }
 
     @PutMapping("{id}")
+    @PreAuthorize("haRole('ADMIN')")
     public ResponseEntity<Object> atualizar(@Valid @PathVariable("id") String id, @RequestBody AutorDTO autorDTO){
 
         try {
