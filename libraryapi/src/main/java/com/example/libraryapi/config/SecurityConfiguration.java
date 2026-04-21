@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -19,6 +20,8 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+
+@EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)  // permite o controle de acesso pela controller sem precisar de apontar abaixo (poderia deixar aqui apenas o permitAll)
 public class SecurityConfiguration {
 
     // Quando habilito este bean sobrepoe o padrão que gera  a chave de autenticacao
@@ -34,11 +37,15 @@ public class SecurityConfiguration {
 
                 .authorizeHttpRequests(authorize -> {
                         authorize.requestMatchers("/login").permitAll();
+                        authorize.requestMatchers(HttpMethod.POST,"/usuarios/**").permitAll(); // todos podem cadastrar
+
+                        // ** authorize abaixo comentados pq estarao sendo setados na controller pelo @EnableMethodSecurity**
+                        /*
                         authorize.requestMatchers("/autores/**").hasRole("ADMIN"); // apenas admin pode acessar
                         //authorize.requestMatchers(HttpMethod.POST,"/autores/**").hasRole("ADMIN"); //se quiser uma rota/ methodo especifico
                         authorize.requestMatchers("/livros/**").hasAnyRole("ADMIN", "USER");
+                        */
 
-                        authorize.requestMatchers(HttpMethod.POST,"/usuarios/**").permitAll(); // todos podem cadastrar
 
                         authorize.anyRequest().authenticated();
                         // tudo que vier abaixo perde  funcao
